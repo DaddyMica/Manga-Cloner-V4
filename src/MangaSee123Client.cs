@@ -27,7 +27,7 @@ namespace MangaSee123
             { // so if we're in an active session
                 if (ApiKey == null && uuid == null)
                 { // we have to create an api key
-                    dynamic json = MicaRequests.PostData($"{Tunnel}/api/gateway/authorize", new { auth_key = Authkey, client = "cs0.0.1", host = "localhost", os = "win" });
+                    dynamic? json = MicaRequests.PostData($"{Tunnel}/api/gateway/authorize", new { auth_key = Authkey, client = "cs0.0.1", host = "localhost", os = "win" });
 
                     if (json != null)
                     {
@@ -55,15 +55,37 @@ namespace MangaSee123
             // get on ma level btch
             dynamic? json = MicaRequests.PostData($"{Tunnel}/api/mangas/{title}/chapters/{chapter}/pages/{page}", JsonPayload);
 
-            if (json != null)
-            {
-                if ((json.tags) == 0)
-                    return (string)json.url;
-                else
-                    return string.Empty;
+            if (json != null && (json.tags) == 0)
+                return (string)json.url;
+            else
+                return string.Empty;
+        }
+
+        public List<string>? GetChapter(string title, string chapter)
+        {
+            int          page = 1;
+            List<string> urls = new List<string> { };
+
+            while (true)
+            {   // get newpage object
+                string NewPage = GetPage(title, chapter, page.ToString());
+                // check it
+                if (NewPage != string.Empty)
+                {
+                    Console.WriteLine($"[*] New Page: {NewPage} [*]");
+                    // add to list
+                    urls.Add(NewPage);
+                    page++;
+                }
+                
+                else if (NewPage == string.Empty)
+                    break;
             }
 
-            return string.Empty;
+            if ((urls.Count) > 0)
+                return urls;
+            else
+                return null;
         }
     }
 }

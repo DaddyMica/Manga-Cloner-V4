@@ -5,8 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 // HttpClient wrapper lols
-// For Http Requests
-using System.Net.Http;
 // For parsing json data
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -24,7 +22,10 @@ namespace HttpRequests
                 StringContent stringContent  = new StringContent(JsonContent, Encoding.UTF8, "application/json");
 
                 if (HeadersObject != null)
-                    client.DefaultRequestHeaders.Add("Authorization", HeadersObject["Authorization"]);
+                { // add headers to the request if added in inputs
+                    foreach (KeyValuePair<string, string> entry in HeadersObject)
+                        client.DefaultRequestHeaders.Add(entry.Key, entry.Value);
+                }
                 // exec the request 
                 HttpResponseMessage response = client.PostAsync(Url, stringContent).Result;
 
@@ -39,16 +40,7 @@ namespace HttpRequests
         public static bool Ping(string Uri)
         { // Function to ping endp & ret a bool
             using (HttpClient client = new HttpClient())
-            {
-                HttpResponseMessage response = client.GetAsync(Uri).Result;
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
-                }
-                else
-                    return false;
-            }
+                return client.GetAsync(Uri).Result.IsSuccessStatusCode;
         }
     }
 }
