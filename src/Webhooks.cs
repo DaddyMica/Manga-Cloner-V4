@@ -1,67 +1,75 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿// Webhooks module i had to write to fix dis bitch lols
+// modeled after discord-webhook
+using System;
 using System.Text;
-using System.Threading.Tasks;
 
-using HttpRequests;
-
-using Newtonsoft.Json.Linq;
+// Parsing Json Content
 using Newtonsoft.Json;
-using System.Net.Http.Json;
 
 namespace MicaWebhooks
 {
     public class Webhooks
     {
         public string? WebhookUri;
-        public string? UserName;
-        public string? Content;
-        public string? AvatarUrl;
         public Dictionary<string, string>? Payload;
 
-        public Webhooks(string WebhookUri, string? UserName=null, string? Content=null, string? AvatarUrl=null)
-        { // Constructor for webhooks class lol
-            Dictionary<string, string> Payload = new Dictionary<string, string>();
-            // ping uri
-            if (MicaRequests.Ping(WebhookUri))
-                this.WebhookUri = WebhookUri;
+        private static bool Ping(string uri, Dictionary<string, string>? HeadersObject = null, Object? AnonHeadersObj = null)
+        { // Static method to validate uri
+            using (HttpClient client = new HttpClient())
+            { // Add headers to request if inputted
+                if (HeadersObject != null)
+                    foreach (KeyValuePair<string, string> entry in HeadersObject)
+                        client.DefaultRequestHeaders.Add(entry.Key, entry.Value);
 
-            if (UserName != null)
-                Payload.Add("username", UserName);
+                return client.GetAsync(uri).Result.IsSuccessStatusCode;
+            }
+        }
+        public Webhooks(string Webhookuri, string? Content = null, string? UserName = null)
+        { // Constructor for webhooks class
+            if (Ping(Webhookuri))
+            { // ya digg?
+                Payload = new Dictionary<string, string>();
+                this.WebhookUri = Webhookuri;
 
-            if (Content != null)
-                Payload.Add("content", Content);
+                if (Content != null)
+                    Payload.Add("content", Content);
 
-            if (AvatarUrl != null)
-                Payload.Add("avatar_url", AvatarUrl);
+                if (UserName != null)
+                    Payload.Add("username", UserName);
+            }
         }
 
-        public JObject? ExecuteWebhook(string? Content=null, string? UserName=null, string? AvatarUrl=null)
-        { // Function to execute webhook lols
+        public static Dictionary<string, string> OverwriteHeadersObject(Dictionary<string, string> PayloadObject, string? Content=null, string? UserName=null)
+        {
+            if (Content == null && UserName == null)
+                throw new Exception("supply more args!!!!");
+
             if (Content != null)
-                if (Payload.ContainsKey("content"))
-                    Payload["content"] = Content;
+                PayloadObject["content"] = Content;
             
             if (UserName != null)
-                if (Payload.ContainsKey("username"))
-                    Payload["username"] = UserName;
+                PayloadObject["username"] = UserName;
 
-            if (AvatarUrl != null)
-                if (Payload.ContainsKey("avatar_url"))
-                    Payload["avatar_url"] = AvatarUrl;
+            return PayloadObject;
+        }
 
-            using (HttpClient client = new HttpClient())
+        public bool Execute(string? Content = null, string? UserName = null)
+        { // If inputted, overwrite constructor inps
+            // designed after the discord_webhook py module
+            if (Payload != null)
             {
-                string        jsonString     =     JsonConvert.SerializeObject(Payload);
-                StringContent stringContent  = new StringContent(jsonString, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = client.PostAsync(WebhookUri, stringContent).Result;
+                Dictionary<string, string> PayloadObject = OverwriteHeadersObject(Payload, Content, UserName);
 
-                if (response.IsSuccessStatusCode)
-                    return JObject.Parse(response.Content.ReadAsStringAsync().Result);
-                else
-                    return null;
-            }
+                using (HttpClient client = new HttpClient())
+                {
+                    dynamic? initialResponse = client.PostAsync(WebhookUri, new StringContent(JsonConvert.SerializeObject(PayloadObject), Encoding.UTF8, "application/json")).Result;
+
+                    if (initialResponse != null)
+                        return initialResponse.IsSuccessStatusCode;
+
+                    return false;
+                }
+            } else { return false; }
         }
     }
 }

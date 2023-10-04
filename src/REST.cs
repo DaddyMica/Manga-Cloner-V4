@@ -1,8 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿// REST class for discord http reqs
 using System;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 
 // custom req lib
 using HttpRequests;
@@ -15,22 +13,17 @@ namespace REST_API
         public string? Guild;
 
         public static bool CheckToken(string Token)
-        {
+        { // Method to check bot token for validity
             using (HttpClient client = new HttpClient())
             { // add headers
                 client.DefaultRequestHeaders.Add("Authorization", $"Bot {Token}");
-
-                HttpResponseMessage response = client.GetAsync("https://discord.com/api/v9/users/@me").Result;
-
-                if (response.IsSuccessStatusCode)
-                    return true;
-                else
-                    return false;
+                // exec req & ret
+                return client.GetAsync("https://discord.com/api/v9/users/@me").Result.IsSuccessStatusCode;
             }
         }
         public REST(string AuthToken, string Guild)
         { // REST class for manga cloner V4!!
-            if (CheckToken(AuthToken) && Guild != null)
+            if (CheckToken(AuthToken) && (Guild != null))
             {
                 Token      = AuthToken;
                 this.Guild = Guild;

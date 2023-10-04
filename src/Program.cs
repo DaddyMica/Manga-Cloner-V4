@@ -1,4 +1,5 @@
-﻿using System;
+﻿// FREE SEX!
+using System;
 
 // Discord wrapper in C#
 using DSharpPlus; 
@@ -7,10 +8,12 @@ using MangaSee123;
 using REST_API;
 using MicaWebhooks;
 
-public class Program
-{  // TODO: write cloner class when well rested
+public class MicaApp
+{  // Class that clones manga in discord servers
+    // Made fully by mica
+    // the csharpist god
     public static DiscordClient CreateNewClient(string Token)
-    {
+    { // Function to create a new discord client w intents
         return new DiscordClient(new DiscordConfiguration()
         {
             Token = Token,
@@ -27,7 +30,7 @@ public class Program
         // new shit
         MangaSee123Client MangaSeeClient = new MangaSee123Client(argv[0], argv[1]);
         REST              rest           = new REST(argv[2], argv[3]);
-        int               chapter        = 1;
+        int               chapter        = 1; // start at ch 1 ofc
 
         while (true)
         {
@@ -38,7 +41,7 @@ public class Program
                 string NewChannel = rest.CreateChannel($"{argv[4]}-{chapter}");
 
                 if (NewChannel != null)
-                {
+                { // Create new webhook upon channel creation
                     string NewWebhook = rest.CreateWebhook(NewChannel, $"{argv[4]}-{chapter}");
 
                     Console.WriteLine($"[*] Created New Channel & Webhook: {NewWebhook} [*]");
@@ -46,8 +49,11 @@ public class Program
 
                     for (int i = 0; i < NewChapter.Count; i++)
                     {
-                        new Webhooks(NewWebhook).ExecuteWebhook(NewChapter[i], $"{argv[4]}-{chapter}-{i + 1}");
-                        Thread.Sleep(3000);
+                        if (new Webhooks(NewWebhook).Execute(NewChapter[i], $"{argv[4]}-{chapter}-{i + 1}"))
+                        {
+                            Console.WriteLine($"[*] Sent: {NewChapter[i]} tohook! [*]");
+                            Thread.Sleep(3000);
+                        }
                     }
                     chapter++;
                 }
@@ -56,9 +62,10 @@ public class Program
                 break;
         }
     }
+
     public static async Task Main(string[] args)
-    {
-        var discord = CreateNewClient(args[2]);
+    { // Main Function!
+        DiscordClient discord = CreateNewClient(args[2]);
 
         discord.MessageCreated += async (s, e) =>
         {
@@ -68,7 +75,12 @@ public class Program
 
         discord.SocketOpened += async (s, e) =>
         {
-            CloneManga(args);
+            try
+            { // Clone it type shi     
+                CloneManga(args);
+                // catch exc
+            } catch (Exception ex) { Console.WriteLine(ex.ToString()); }
+                
         };
 
         await discord.ConnectAsync();

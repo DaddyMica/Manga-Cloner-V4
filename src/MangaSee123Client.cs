@@ -17,7 +17,7 @@ namespace MangaSee123
         public string? Authkey;
         public string? ApiKey;
         public string? _uuid;
-        public JObject InitialHandshakePayload;
+        public JObject? InitialHandshakePayload;
 
         public MangaSee123Client(string Tunnel, string Authkey, string? ApiKey=null, string? uuid=null)
         { // Official MangaSee123Api-Client In CSharp!
