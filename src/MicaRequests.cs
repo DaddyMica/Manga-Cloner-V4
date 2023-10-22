@@ -6,7 +6,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace HttpRequests
+namespace MangaClonerV4
 {
     public class MicaRequests
     { // 1 method is all i need lols
