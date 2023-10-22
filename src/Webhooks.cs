@@ -6,7 +6,7 @@ using System.Text;
 // Parsing Json Content
 using Newtonsoft.Json;
 
-namespace MicaWebhooks
+namespace MangaClonerV4
 {
     public class Webhooks
     {
