@@ -5,7 +5,7 @@ using System.Text;
 // custom req lib
 using HttpRequests;
 
-namespace REST_API
+namespace MangaClonerV4
 {
     public class REST
     {
