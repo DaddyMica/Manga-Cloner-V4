@@ -3,10 +3,8 @@ using System;
 
 // Discord wrapper in C#
 using DSharpPlus; 
-// custom libs
-using MangaSee123;
-using REST_API;
-using MicaWebhooks;
+// custom project namespace
+using MangaClonerV4;
 
 public class MicaApp
 {  // Class that clones manga in discord servers
