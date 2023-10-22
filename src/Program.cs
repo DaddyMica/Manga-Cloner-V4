@@ -46,7 +46,7 @@ public class MicaApp
 
                     Console.WriteLine($"[*] Created New Channel & Webhook: {NewWebhook} [*]");
                     Console.WriteLine($"[!] Sending Chapter [!]");
-
+                    // iterate through the new chapter to send to hook
                     for (int i = 0; i < NewChapter.Count; i++)
                     {
                         if (new Webhooks(NewWebhook).Execute(NewChapter[i], $"{argv[4]}-{chapter}-{i + 1}"))
@@ -66,15 +66,15 @@ public class MicaApp
     public static async Task Main(string[] args)
     { // Main Function!
         DiscordClient discord = CreateNewClient(args[2]);
-
+        // handle message event
         discord.MessageCreated += async (s, e) =>
         {
             if (e.Message.Content.ToLower().StartsWith("ping"))
                 await e.Message.RespondAsync("pong!");
         };
-
+        // handle ON_READY event
         discord.SocketOpened += async (s, e) =>
-        {
+        { // try/catch block 
             try
             { // Clone it type shi     
                 CloneManga(args);
@@ -82,7 +82,7 @@ public class MicaApp
             } catch (Exception ex) { Console.WriteLine(ex.ToString()); }
                 
         };
-
+        // sleep the thread until connection is made
         await discord.ConnectAsync();
         await Task.Delay(-1);
     }
