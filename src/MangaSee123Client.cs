@@ -9,7 +9,7 @@ using HttpRequests;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace MangaSee123
+namespace MangaClonerV4
 {
     public class MangaSee123Client
     {
